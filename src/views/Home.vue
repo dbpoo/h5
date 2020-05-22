@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div>123123</div>
+    <div class="txt">123123</div>
     <van-button type="default">默认按钮</van-button>
     <van-button type="primary">主要按钮</van-button>
     <van-button type="info">信息按钮</van-button>
@@ -19,3 +19,11 @@ export default {
   name: "Home",
 };
 </script>
+
+<style lang="less" scoped>
+.txt {
+  width: 750px;
+  height: 1000px;
+  background-color: #ff0000;
+}
+</style>
