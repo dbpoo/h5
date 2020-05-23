@@ -1,46 +1,45 @@
 import { stringify } from "qs";
-import _ from "lodash";
-import configApis from "./interface";
 import request from "./request";
 
-const vueHttp = {};
-_.each(configApis, (v, k) => {
-  vueHttp[k] = params => {
-    let url = v.url;
-    let method = _.toLower(v.method || "get");
+const http = {
+  get: (url, params, opt) => {
     let requestUrl = url;
-    let targetURL = v.targetURL;
-    let option = {
-      method: _.toUpper(v.method),
+    let options = {
+      method: "GET",
       headers: {
-        ...v.headers
+        ...opt.headers,
       },
-      stringBody: v.stringBody,
-      needPassport: v.needPassport
     };
-    if (method == "get") {
-      if (params) {
-        requestUrl = `${url}?${stringify(params)}`;
-      }
-    } else if (method == "post") {
-      if (v.stringBody) {
-        option = {
-          ...option,
-          cotnentType: "application/x-www-form-urlencoded",
-          dataType: "json",
-          body: params
-        };
-      } else {
-        option = {
-          ...option,
-          cotnentType: "application/json;charset=utf-8",
-          dataType: "json",
-          body: params
-        };
-      }
+    if (params) {
+      requestUrl = `${url}?${stringify(params)}`;
     }
-    return request(requestUrl, option, targetURL);
-  };
-});
+    return request(requestUrl, options);
+  },
+  post: (url, params, opt) => {
+    let requestUrl = url;
+    let options = {
+      method: "POST",
+      headers: {
+        ...opt.headers,
+      },
+    };
+    if (opt.stringBody) {
+      options = {
+        ...options,
+        cotnentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        body: params,
+      };
+    } else {
+      options = {
+        ...options,
+        cotnentType: "application/json;charset=utf-8",
+        dataType: "json",
+        body: params,
+      };
+    }
+    return request(requestUrl, options);
+  },
+};
 
-export default vueHttp;
+export default http;

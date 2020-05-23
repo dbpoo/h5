@@ -1,5 +1,3 @@
-// import _ from "lodash";
-import fetchJSONP from "fetch-jsonp";
 import "whatwg-fetch";
 import "es6-promise";
 import { Toast } from "vant";
@@ -101,7 +99,6 @@ function request(url, option, targetURL) {
           };
           Toast(codeMessage[json.errorCode]);
           reject(error);
-          return error;
         }
         if (json.errorCode == "302") {
           console.log("302");

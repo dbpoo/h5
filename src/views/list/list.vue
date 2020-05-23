@@ -28,6 +28,20 @@
 <script>
 export default {
   name: "list",
+  data() {
+    return {};
+  },
+  methods: {
+    getCms() {
+      let res = $http.get("http://api.lkbt.pro/wp-json/wp/v2/posts", {
+        categories: this.categories,
+        page: page,
+      });
+    },
+  },
+  mounted() {
+    this.getCms(this.page);
+  },
 };
 </script>
 
