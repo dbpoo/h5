@@ -196,6 +196,7 @@ export default {
   .price {
     flex: 0 0 auto;
     font-size: 25px;
+    margin-left: 20px;
   }
 }
 

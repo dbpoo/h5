@@ -92,9 +92,8 @@ export default {
     padding: 20px 30px;
     p {
       text-indent: 60px;
-      font-size: 34px;
+      font-size: 28px;
       padding-top: 20px;
-      line-height: 1.8;
     }
   }
 }
@@ -113,14 +112,13 @@ export default {
       height: 230px;
     }
     li.li2 {
-      font-size: 50px;
+      font-size: 40px;
       color: #007586;
       font-weight: bold;
       margin: 60px 0;
     }
     li.li3 {
-      font-size: 34px;
-      line-height: 1.8;
+      font-size: 28px;
     }
   }
   ul.ul1 {
