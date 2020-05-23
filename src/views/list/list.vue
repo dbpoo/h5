@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-    123
+    新闻列表页
   </div>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-    123
+    首页
   </div>
 </template>
 

@@ -24,7 +24,7 @@ export default {
   name: "login",
   data() {
     return {
-      logType: 1, // 0 账号登录 1验证码登录
+      logType: 0, // 0 账号登录 1验证码登录
     };
   },
   methods: {

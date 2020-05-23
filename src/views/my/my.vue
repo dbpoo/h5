@@ -60,7 +60,7 @@ export default {
 
 <style lang="less" scoped>
 .my {
-  height: 100%;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -188,6 +188,8 @@ export default {
       }
       li.li2 {
         font-size: 18px;
+        word-wrap: break-word;
+        word-break: break-all;
       }
     }
   }
