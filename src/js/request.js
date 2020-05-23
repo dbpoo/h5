@@ -1,6 +1,5 @@
 import "whatwg-fetch";
 import "es6-promise";
-import { Toast } from "vant";
 
 const codeMessage = {
   200: "服务器成功返回请求的数据",
@@ -19,7 +18,7 @@ const codeMessage = {
   501: "应用系统异常",
   502: "网关错误",
   503: "服务不可用，服务器暂时过载或维护",
-  504: "网关超时",
+  504: "网关超时"
 };
 
 const transformParams = (params = {}) => {
@@ -38,7 +37,7 @@ const checkStatus = (response) => {
   // eslint-disable-next-line no-undef
   notification.error({
     message: `请求错误 ${response.status}: ${response.url}`,
-    description: errortext,
+    description: errortext
   });
   const error = new Error(errortext);
   error.name = response.status;
@@ -48,20 +47,18 @@ const checkStatus = (response) => {
 
 function request(url, option, targetURL) {
   const options = {
-    ...option,
+    ...option
   };
   const defaultOptions = {
-    credentials: "include",
+    credentials: "include"
   };
   const newOptions = { ...defaultOptions, ...options };
-  const { href } = window.location;
-  const nextURL = targetURL || href;
   if (newOptions.method === "POST" || newOptions.method === "PUT" || newOptions.method === "DELETE") {
     if (!(newOptions.body instanceof FormData)) {
       newOptions.headers = {
         Accept: "application/json",
         "Content-Type": "application/json; charset=utf-8;",
-        ...newOptions.headers,
+        ...newOptions.headers
       };
       if (newOptions.stringBody) {
         newOptions.body = transformParams(newOptions.body);
@@ -71,13 +68,13 @@ function request(url, option, targetURL) {
     } else {
       newOptions.headers = {
         Accept: "application/json",
-        ...newOptions.headers,
+        ...newOptions.headers
       };
     }
   } else {
     newOptions.headers = {
       Accept: "application/json",
-      ...newOptions.headers,
+      ...newOptions.headers
     };
   }
 
@@ -92,15 +89,14 @@ function request(url, option, targetURL) {
         return response.json();
       })
       .then((json) => {
-        if (json.errorCode == "501") {
-          const error = {
+        if (json.errorCode === "501") {
+          const err = {
             retFlag: 0,
-            errorMessage: codeMessage[json.errorCode],
+            errorMessage: codeMessage[json.errorCode]
           };
-          Toast(codeMessage[json.errorCode]);
-          reject(error);
+          reject(err);
         }
-        if (json.errorCode == "302") {
+        if (json.errorCode === "302") {
           console.log("302");
         } else {
           resolve(json);

@@ -2,13 +2,10 @@ import { stringify } from "qs";
 import request from "./request";
 
 const http = {
-  get: (url, params, opt) => {
+  get: (url, params) => {
     let requestUrl = url;
-    let options = {
-      method: "GET",
-      headers: {
-        ...opt.headers,
-      },
+    const options = {
+      method: "GET"
     };
     if (params) {
       requestUrl = `${url}?${stringify(params)}`;
@@ -16,30 +13,27 @@ const http = {
     return request(requestUrl, options);
   },
   post: (url, params, opt) => {
-    let requestUrl = url;
+    const requestUrl = url;
     let options = {
-      method: "POST",
-      headers: {
-        ...opt.headers,
-      },
+      method: "POST"
     };
     if (opt.stringBody) {
       options = {
         ...options,
         cotnentType: "application/x-www-form-urlencoded",
         dataType: "json",
-        body: params,
+        body: params
       };
     } else {
       options = {
         ...options,
         cotnentType: "application/json;charset=utf-8",
         dataType: "json",
-        body: params,
+        body: params
       };
     }
     return request(requestUrl, options);
-  },
+  }
 };
 
 export default http;

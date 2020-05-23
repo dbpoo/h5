@@ -1,10 +1,10 @@
 module.exports = {
   root: true,
   env: {
-    node: true,
+    node: true
   },
   globals: {
-    $http: true,
+    $http: true
   },
   extends: ["plugin:vue/essential", "@vue/standard"],
   rules: {
@@ -13,8 +13,9 @@ module.exports = {
     quotes: 0,
     semi: 0,
     "space-before-function-paren": 0,
+    eqeqeq: 0
   },
   parserOptions: {
-    parser: "babel-eslint",
-  },
+    parser: "babel-eslint"
+  }
 };
