@@ -12,7 +12,7 @@
       <div class="link-li">
         <a href="javascript:;" v-if="logType == 1" @click="toAccess">账号登录</a>
         <a href="javascript:;" v-if="logType == 0" @click="toVerification">验证码登录</a>
-        <a href="javascript:;">忘记密码</a>
+        <router-link :to="{ name: 'register' }">找回密码</router-link>
       </div>
       <div class="button">提交</div>
     </div>
@@ -21,20 +21,20 @@
 
 <script>
 export default {
-  name: "Login",
+  name: "login",
   data() {
     return {
       logType: 1, // 0 账号登录 1验证码登录
     };
   },
-   methods: {
-     toAccess() {
-       this.logType = 0;
-     },
-     toVerification() {
-       this.logType = 1;
-     }
-   }
+  methods: {
+    toAccess() {
+      this.logType = 0;
+    },
+    toVerification() {
+      this.logType = 1;
+    },
+  },
 };
 </script>
 
@@ -55,11 +55,6 @@ export default {
   background: url("../../assets/avatar.png") 0 0 no-repeat;
   background-size: contain;
   margin-bottom: 70px;
-}
-
-.button {
-  display: flex;
-  justify-content: center;
 }
 
 .formbox {
@@ -120,7 +115,7 @@ export default {
   color: #007586;
   background-color: #99c8cf;
   border-radius: 20px;
-  text-align: left;
+  text-align: center;
 }
 
 .link-li {

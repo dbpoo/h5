@@ -211,3 +211,31 @@ textarea::-webkit-input-placeholder {
 .icon {
   display: inline-block;
 }
+
+/*文本溢出省略号*/
+.ellips-1,
+.ellips-2,
+.ellips-3,
+.ellips-4 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+
+.ellips-1 {
+  -webkit-line-clamp: 1;
+}
+
+.ellips-2 {
+  -webkit-line-clamp: 2;
+}
+
+.ellips-3 {
+  -webkit-line-clamp: 3;
+}
+
+.ellips-4 {
+  -webkit-line-clamp: 4;
+}

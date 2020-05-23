@@ -7,6 +7,7 @@
 <style lang="less">
 @import "css/reset";
 .page {
+  height: 100vh;
   font-size: 24px;
 }
 </style>
