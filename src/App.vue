@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page" :class="{ keepAlive: $route.meta.keepAlive }">
     <template v-if="$route.meta.keepAlive">
       <router-view></router-view>
       <van-tabbar route inactive-color="#cbf8ff" active-color="#6bfff6">
@@ -31,8 +31,11 @@ export default {};
 <style lang="less">
 @import "css/reset";
 .page {
-  height: 100vh;
+  min-height: 100vh;
   font-size: 24px;
+}
+.keepAlive {
+  padding-bottom: 120px;
 }
 .van-tabbar {
   background-color: #007586;
