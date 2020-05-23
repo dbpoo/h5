@@ -18,8 +18,8 @@ const routes = [
     component: Index,
     meta: {
       title: "首页",
-      keepAlive: true,
-    },
+      keepAlive: true
+    }
   },
   {
     path: "/list",
@@ -27,17 +27,17 @@ const routes = [
     component: List,
     meta: {
       title: "新闻",
-      keepAlive: true,
-    },
+      keepAlive: true
+    }
   },
   {
-    path: "/detail",
+    path: "/detail/:id",
     name: "detail",
     component: Detail,
     meta: {
       title: "新闻",
-      keepAlive: true,
-    },
+      keepAlive: true
+    }
   },
   {
     path: "/login",
@@ -45,8 +45,8 @@ const routes = [
     component: Login,
     meta: {
       title: "登录",
-      keepAlive: false,
-    },
+      keepAlive: false
+    }
   },
   {
     path: "/register",
@@ -54,8 +54,8 @@ const routes = [
     component: Register,
     meta: {
       title: "登录",
-      keepAlive: false,
-    },
+      keepAlive: false
+    }
   },
   {
     path: "/my",
@@ -63,8 +63,8 @@ const routes = [
     component: My,
     meta: {
       title: "我的",
-      keepAlive: true,
-    },
+      keepAlive: true
+    }
   },
   {
     path: "/coin",
@@ -72,13 +72,13 @@ const routes = [
     component: Coin,
     meta: {
       title: "提币",
-      keepAlive: true,
-    },
-  },
+      keepAlive: true
+    }
+  }
 ];
 
 const router = new VueRouter({
-  routes,
+  routes
 });
 
 router.beforeEach((to, from, next) => {

@@ -5,29 +5,32 @@
     </div>
     <div class="banner"></div>
     <div class="news-list">
-      <ul class="item">
-        <li class="li1">Seele元一金融领域应用解析</li>
-        <li class="li2">近年来，大数据、云计算、人工智能、区块链等新兴技术被应用于金融领域，改变了金融产品和金融服务形式。Seele元 […]</li>
-        <li class="li3">
-          <span>[2020-05-22]</span>
-          <span>更多 >></span>
-        </li>
-      </ul>
-      <ul class="item">
-        <li class="li1">Seele元一金融领域应用解析</li>
-        <li class="li2">近年来，大数据、云计算、人工智能、区块链等新兴技术被应用于金融领域，改变了金融产品和金融服务形式。Seele元 […]</li>
-        <li class="li3">
-          <span>[2020-05-22]</span>
-          <span>更多 >></span>
-        </li>
-      </ul>
+      <router-link tag="div" class="item" v-for="(item, index) in listArr" :key="index" :to="`/detail/${item.id}`">
+        <ul class="item">
+          <li class="li1">{{ item.title.rendered }}</li>
+          <li class="li2" v-html="item.excerpt.rendered"></li>
+          <li class="li3">
+            <span>[{{ filterTime(item.date) }}]</span>
+            <span>更多 >></span>
+          </li>
+        </ul>
+      </router-link>
+    </div>
+    <div class="loadmore">
+      <loading :isLoading="isLoading" v-if="isLoading"></loading>
+      <a href="javascript:;" @click="getMore" :class="isOver ? 'is-over' : ''" v-else>{{ isOver ? "没有更多了" : "加载更多" }}</a>
     </div>
   </div>
 </template>
 
 <script>
+import Loading from "../../components/loading/loading";
+
 export default {
   name: "list",
+  components: {
+    Loading
+  },
   data() {
     return {
       isLoading: false,
@@ -39,11 +42,30 @@ export default {
   },
   methods: {
     async getCms(page) {
-      const res = await this.$http.get("http://api.lkbt.pro/wp-json/wp/v2/posts", {
-        categories: this.categories,
-        page: page
-      });
-      console.log(res);
+      try {
+        this.isLoading = true;
+        const res = await this.$http.get("http://api.lkbt.pro/wp-json/wp/v2/posts", {
+          categories: this.categories,
+          page: page
+        });
+        this.isLoading = false;
+        this.listArr = [...this.listArr, ...res];
+        if (this.listArr.length === 0) {
+          this.isOver = true;
+        }
+      } catch (err) {
+        this.isLoading = false;
+        this.isOver = true;
+        console.log(err);
+      }
+    },
+    getMore() {
+      if (this.isOver) return;
+      this.page++;
+      this.getCms(this.page);
+    },
+    filterTime(t) {
+      return t.split("T")[0];
     }
   },
   mounted() {
@@ -86,7 +108,7 @@ export default {
 }
 
 .news-list {
-  padding: 40px;
+  padding: 40px 40px 0 40px;
   ul.item {
     margin-bottom: 40px;
     background-color: #fafafa;
@@ -105,6 +127,29 @@ export default {
       display: flex;
       justify-content: space-between;
     }
+  }
+}
+
+.loadmore {
+  min-height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  a {
+    color: #fff;
+    background-color: #007586;
+    border-radius: 10px;
+    font-size: 30px;
+  }
+  a,
+  span {
+    padding: 20px 60px;
+    color: #fff;
+  }
+  a.is-over {
+    border: 0;
+    color: #ccc;
+    background-color: #f1f1f1;
   }
 }
 </style>
