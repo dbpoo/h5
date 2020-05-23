@@ -64,7 +64,7 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 20px;
+    padding: 20px 30px;
     .location {
       span {
         color: #007586;
@@ -72,13 +72,13 @@ export default {
     }
   }
   .title {
-    margin: 40px 20px;
+    margin: 40px 30px;
     font-size: 34px;
     font-weight: bold;
     text-align: center;
   }
   .content {
-    padding: 0 20px;
+    padding: 0 30px;
     font-size: 28px;
     p {
       margin-bottom: 20px;

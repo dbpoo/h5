@@ -89,7 +89,7 @@ export default {
 
 .col-1 {
   .info {
-    padding: 20px;
+    padding: 20px 30px;
     p {
       text-indent: 60px;
       font-size: 34px;
@@ -101,7 +101,7 @@ export default {
 
 .col-2 {
   background-color: #fafafa;
-  padding: 0 20px;
+  padding: 0 30px;
   ul {
     width: 100%;
     display: flex;
