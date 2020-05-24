@@ -1,4 +1,6 @@
 module.exports = {
+  publicPath: "./",
+  filenameHashing: false,
   css: {
     loaderOptions: {
       less: {
@@ -6,9 +8,9 @@ module.exports = {
         modifyVars: {
           // 直接覆盖变量
           "text-color": "#010101",
-          "green": "#007586",
-        },
-      },
-    },
-  },
+          green: "#007586"
+        }
+      }
+    }
+  }
 };
