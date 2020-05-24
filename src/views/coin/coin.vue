@@ -50,20 +50,16 @@ export default {
       isLogin: false
     };
   },
-  methods: {
-    init() {
-      this.isLogin = get("isLogin");
-      if (!this.isLogin) {
-        this.$router.push({
-          name: "login"
-        });
-      } else {
-        this.currency = get("currency");
-      }
-    }
-  },
+  methods: {},
   mounted() {
-    this.init();
+    this.isLogin = get("isLogin");
+    if (!this.isLogin) {
+      this.$router.push({
+        name: "login"
+      });
+    } else {
+      this.currency = get("currency");
+    }
   }
 };
 </script>

@@ -4,7 +4,7 @@
       <div class="info-l">
         <div class="copy">
           <div class="copy-txt ellips-1">{{ use.walletaddress }}</div>
-          <div class="copy-btn" id="code" :data-clipboard-text="use.walletaddress" @click="onCopy"></div>
+          <div class="copy-btn" id="copy" :data-clipboard-text="use.walletaddress" @click="onCopy"></div>
         </div>
         <div class="qr" id="qrcode"></div>
       </div>
@@ -66,7 +66,10 @@ export default {
     return {
       use: "",
       currency: "",
-      isLogin: false
+      isLogin: false,
+      current: 1,
+      total: 0,
+      list: []
     };
   },
   methods: {
@@ -78,11 +81,11 @@ export default {
     onCopy() {
       const clipboard = new Clipboard("#copy");
       clipboard.on("success", (e) => {
-        this.$message({ type: "success", message: "复制成功" });
+        Toast("复制成功");
         clipboard.destroy();
       });
       clipboard.on("error", (e) => {
-        this.$message({ type: "waning", message: "该浏览器不支持自动复制" });
+        Toast("该浏览器不支持自动复制");
         clipboard.destroy();
       });
     },
@@ -99,37 +102,58 @@ export default {
         console.log(err);
       }
     },
+    async transactionRecord() {
+      try {
+        const params = {
+          current: this.current,
+          filtrations: [
+            {
+              fieldName: "userId",
+              fieldValue: this.use.id,
+              operator: "eq"
+            }
+          ],
+          size: 10
+        };
+        const res = await this.$http.post(host.API + "transactionRecord/pageList", params);
+        if (res.errorCode === 200) {
+          this.list = res.data;
+        } else {
+          Toast(res.msg);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
     toCoin() {
       this.$router.push({
         name: "coin"
       });
-    },
-    init() {
-      this.isLogin = get("isLogin");
-      if (!this.isLogin) {
-        this.$router.push({
-          name: "login"
-        });
-      } else {
-        this.use = get("use");
-        if (this.use) {
-          if (this.use.walletqrcode) {
-            // eslint-disable-next-line no-new
-            new QRCode("qrcode", {
-              text: this.use.walletqrcode,
-              width: 80,
-              height: 80
-            });
-          }
-          if (this.use.id) {
-            this.getCurrency();
-          }
-        }
-      }
     }
   },
   mounted() {
-    this.init();
+    this.isLogin = get("isLogin");
+    if (!this.isLogin) {
+      this.$router.push({
+        name: "login"
+      });
+    } else {
+      this.use = get("use");
+      if (this.use) {
+        if (this.use.walletqrcode) {
+          // eslint-disable-next-line no-new
+          new QRCode("qrcode", {
+            text: this.use.walletqrcode,
+            width: 80,
+            height: 80
+          });
+        }
+        if (this.use.id) {
+          this.getCurrency();
+          this.transactionRecord();
+        }
+      }
+    }
   }
 };
 </script>

@@ -5,16 +5,20 @@
       <div class="input">
         <div class="input-li "><i class="input-li1"></i><input type="text" placeholder="请输入手机号码" v-model="phoneNumber" /></div>
         <div class="input-li ">
-          <i class="input-li2"></i><input type="text" placeholder="请输入验证码" v-model="codeNumber" /><span>获取验证码</span>
+          <i class="input-li2"></i>
+          <input type="text" placeholder="请输入验证码" v-model="codeNumber" />
+          <span @click="onVerification" v-show="codeFlag">获取验证码</span>
+          <span v-show="!codeFlag">{{ count }} s</span>
         </div>
-        <div class="input-li"><i class="input-li3"></i><input type="text" placeholder="请输入新密码" v-model="password" /></div>
+        <div class="input-li"><i class="input-li3"></i><input type="password" placeholder="请输入新密码" v-model="password" /></div>
       </div>
-      <div class="button">提交</div>
+      <div class="button" @click="onPassport">提交</div>
     </div>
   </div>
 </template>
 
 <script>
+import { get } from "../../js/storage";
 import host from "../../js/host";
 import Vue from "vue";
 import { Toast } from "vant";
@@ -25,9 +29,14 @@ export default {
   name: "register",
   data() {
     return {
+      use: "",
       phoneNumber: "",
       codeNumber: "",
-      password: ""
+      password: "",
+      timer: "",
+      codeFlag: true,
+      count: 0,
+      canClick: true
     };
   },
   methods: {
@@ -42,15 +51,83 @@ export default {
           Toast("请输入正确的手机号");
           return;
         }
+        if (!this.canClick) return;
+        this.canClick = false;
         const res = await this.$http.get(host.API + "login/sendSms/" + this.phoneNumber);
-        if (res.errorCode) {
+        if (res.errorCode === 200) {
+          Toast(res.msg);
+          this.getCode();
+        } else {
+          Toast(res.msg);
+          this.canClick = true;
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    getCode() {
+      const TIME_COUNT = 60;
+      if (!this.timer) {
+        this.count = TIME_COUNT;
+        this.codeFlag = false;
+        this.timer = setInterval(() => {
+          if (this.count > 0 && this.count <= TIME_COUNT) {
+            this.count--;
+          } else {
+            this.codeFlag = true;
+            clearInterval(this.timer);
+            this.timer = null;
+            this.canClick = true;
+          }
+        }, 1000);
+      }
+    },
+    onPassport() {
+      const phoneReg = /^1[0-9]{10}$/;
+      if (!this.phoneNumber) {
+        Toast("请输入手机号");
+        return;
+      }
+      if (!phoneReg.test(this.phoneNumber)) {
+        Toast("请输入正确的手机号");
+        return;
+      }
+      if (!this.codeNumber) {
+        Toast("请输入验证码");
+        return;
+      }
+      this.restPwd();
+    },
+    async restPwd() {
+      try {
+        const params = {
+          id: this.use.id,
+          code: this.codeNumber,
+          phone: this.phoneNumber,
+          password: this.password
+        };
+        const res = await this.$http.put(host.API + "login/restPwd", params);
+        if (res.errorCode === 200) {
+          this.$router.push({
+            name: "my"
+          });
+        } else {
           Toast(res.msg);
         }
       } catch (err) {
-        this.isLoading = false;
-        this.isOver = true;
         console.log(err);
       }
+    }
+  },
+  mounted() {
+    this.isLogin = get("isLogin");
+    if (!this.isLogin) {
+      this.$router.push({
+        name: "login"
+      });
+    } else {
+      this.use = get("use");
+      this.phoneNumber = this.use.phone;
     }
   }
 };
@@ -99,6 +176,7 @@ export default {
     height: 48px;
     line-height: 48px;
     background: none;
+    color: #fff;
   }
   i,
   span {
