@@ -19,34 +19,22 @@
       </div>
     </div>
     <div class="button" @click="toCoin">提币</div>
-    <div class="my-link">
-      <a href="javascript:;" @click="onPassport">修改密码</a>
-    </div>
-    <div class="coin-list">
-      <div class="time">4月20 2020</div>
+    <div class="my-link"><a href="javascript:;" @click="onPassport">修改密码</a> | <a href="javascript:;" @click="onOut">退出</a></div>
+    <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad" class="coin-list" :immediate-check="false">
       <div class="list">
-        <div class="item item-to">
+        <div :class="'item item-operator' + item.operator" v-for="(item, index) in list" :key="index">
           <div class="icon"></div>
           <div class="info">
             <ul>
-              <li class="li1">已发送</li>
-              <li class="li2">To: 0x1Nh7uHdv0x1Nh7uHdv0x1Nh7uHdv</li>
+              <li class="li1">{{ stateMap(item.state) }}</li>
+              <li class="li2">{{ item.operator == 1 ? "To" : "From" }}: {{ item.walletAddress }}</li>
+              <li class="li3">{{ item.transactionTime }}</li>
             </ul>
           </div>
-          <div class="price">-0 SEELE</div>
-        </div>
-        <div class="item item-from">
-          <div class="icon"></div>
-          <div class="info">
-            <ul>
-              <li class="li1">已发送</li>
-              <li class="li2">From: 0x1Nh7uHdv0x1Nh7uHdv</li>
-            </ul>
-          </div>
-          <div class="price">+0.1628 SEELE</div>
+          <div class="price">{{ item.operator == 1 ? "-" : "+" }}{{ item.amount }} SEELE</div>
         </div>
       </div>
-    </div>
+    </van-list>
   </div>
 </template>
 
@@ -56,8 +44,9 @@ import { set, get } from "../../js/storage";
 import QRCode from "qrcodejs2";
 import host from "../../js/host";
 import Clipboard from "clipboard";
-import { Toast } from "vant";
+import { Toast, List } from "vant";
 
+Vue.use(List);
 Vue.use(Toast);
 
 export default {
@@ -67,12 +56,26 @@ export default {
       use: "",
       currency: "",
       isLogin: false,
-      current: 1,
+      page: 1,
+      size: 6,
       total: 0,
-      list: []
+      list: [],
+      loading: false,
+      finished: false
     };
   },
   methods: {
+    onLoad() {
+      if (this.use.id) {
+        this.transactionRecord();
+      }
+    },
+    onOut() {
+      sessionStorage.clear();
+      this.$router.push({
+        name: "index"
+      });
+    },
     onPassport() {
       this.$router.push({
         name: "register"
@@ -104,8 +107,9 @@ export default {
     },
     async transactionRecord() {
       try {
+        const { page, size } = this;
         const params = {
-          current: this.current,
+          current: this.page,
           filtrations: [
             {
               fieldName: "userId",
@@ -113,11 +117,17 @@ export default {
               operator: "eq"
             }
           ],
-          size: 10
+          size: this.size
         };
         const res = await this.$http.post(host.API + "transactionRecord/pageList", params);
         if (res.errorCode === 200) {
-          this.list = res.data;
+          const data = res.data.records;
+          const total = res.data.total || 0;
+          const list = page == 1 ? data : [...this.list, ...data];
+          this.list = list;
+          this.finished = page * size >= total;
+          this.loading = false;
+          this.page = page + 1;
         } else {
           Toast(res.msg);
         }
@@ -129,6 +139,17 @@ export default {
       this.$router.push({
         name: "coin"
       });
+    },
+    stateMap(type) {
+      const map = new Map([
+        [1, "已发送"],
+        [2, "已收到"],
+        [3, "已提币"],
+        [4, "审核中"],
+        [5, "审核通过"],
+        [6, "未通过审核"]
+      ]);
+      return map.get(+type);
     }
   },
   mounted() {
@@ -308,7 +329,7 @@ export default {
   }
 }
 
-.item-to {
+.item-operator1 {
   .icon {
     background: url("../../assets/icon_to.png") 0 0 no-repeat;
     background-size: contain;
@@ -318,7 +339,8 @@ export default {
   }
 }
 
-.item-from {
+.item-operator2,
+.item-operator3 {
   .icon {
     background: url("../../assets/icon_from.png") 0 0 no-repeat;
     background-size: contain;

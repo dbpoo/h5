@@ -21,16 +21,18 @@
       </div>
     </div>
 
-    <div class="title">安全验证</div>
+    <!-- <div class="title">安全验证</div>
     <div class="formbox">
       <div class="input">
         <div class="input-l">验证码：</div>
         <div class="input-c"><input type="text" /></div>
-        <div class="input-r">发送</div>
+        <div class="input-r" @click="onVerification" v-show="codeFlag">发送</div>
+        <div class="input-r" v-show="!codeFlag">{{ count }} s</div>
       </div>
-    </div>
+    </div> -->
 
-    <div class="button">提币</div>
+    <div class="button" @click="onExtractCoin" v-show="btnFlag">提币</div>
+    <div class="button btn-disabled" v-show="!btnFlag">提币</div>
   </div>
 </template>
 
@@ -38,7 +40,7 @@
 import Vue from "vue";
 import host from "../../js/host";
 import _ from "lodash";
-import { get } from "../../js/storage";
+import { set, get } from "../../js/storage";
 import { Toast } from "vant";
 
 Vue.use(Toast);
@@ -52,7 +54,8 @@ export default {
       exchange: "",
       isLogin: false,
       amount: 0,
-      total: 0
+      total: 0,
+      btnFlag: false
     };
   },
   methods: {
@@ -61,14 +64,30 @@ export default {
     },
     changeInput: _.debounce(function(e) {
       if (this.amount >= 100) {
+        this.btnFlag = true;
         this.serviceCharge(this.amount);
       } else if (this.amount > 0 && this.amount < 100) {
+        this.btnFlag = false;
+        this.total = 0;
         Toast("转账提币金额必须大于100");
       }
     }, 500),
+    async getCurrency() {
+      try {
+        const res = await this.$http.get(host.API + "userAccount/getCurrency/" + this.use.id);
+        if (res.errorCode === 200) {
+          this.currency = res.data;
+          set("currency", res.data);
+        } else {
+          Toast(res.msg);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
     async exchangeRate() {
       try {
-        const res = await this.$http.get(host.API + "/userAccount/exchangeRate");
+        const res = await this.$http.get(host.API + "userAccount/exchangeRate");
         if (res.errorCode === 200) {
           this.exchange = res.data.exchangeRate;
         } else {
@@ -78,7 +97,6 @@ export default {
         console.log(err);
       }
     },
-
     async serviceCharge(amount) {
       try {
         const params = {
@@ -86,9 +104,35 @@ export default {
           userId: this.use.id,
           operator: 3
         };
-        const res = await this.$http.post(host.API + "/userAccount/serviceCharge", params);
+        const res = await this.$http.post(host.API + "userAccount/serviceCharge", params);
         if (res.errorCode === 200) {
           this.total = res.data.total;
+        } else {
+          Toast(res.msg);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    // 提币
+    async onExtractCoin() {
+      try {
+        if (this.amount < 100) {
+          Toast("转账提币金额必须大于100");
+        }
+        const params = {
+          amount: this.amount,
+          fromWalletAddress: this.use.walletaddress,
+          operator: 3,
+          remark: "",
+          toWalletAddress: "",
+          userId: this.use.id,
+          withdrawalCode: ""
+        };
+        const res = await this.$http.post(host.API + "userAccount/extractCoin", params);
+        if (res.errorCode === 200) {
+          Toast(res.msg);
+          this.getCurrency();
         } else {
           Toast(res.msg);
         }
@@ -151,6 +195,10 @@ export default {
   border-radius: 20px;
   text-align: center;
   margin-bottom: 90px;
+}
+
+.btn-disabled {
+  background-color: #ccc;
 }
 
 .title {
