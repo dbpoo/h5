@@ -5,9 +5,10 @@
       <div class="input">
         <div class="input-li"><i class="input-li1"></i><input type="text" placeholder="请输入手机号码" v-model="phoneNumber" /></div>
         <div class="input-li" v-if="logType == 1">
-          <i class="input-li2"></i><input type="text" placeholder="请输入验证码" v-model="codeNumber" /><span @click="onVerification"
-            >获取验证码</span
-          >
+          <i class="input-li2"></i>
+          <input type="text" placeholder="请输入验证码" v-model="codeNumber" />
+          <span @click="onVerification" v-show="codeFlag">获取验证码</span>
+          <span v-show="!codeFlag">{{ count }} s</span>
         </div>
         <div class="input-li" v-if="logType == 0"><i class="input-li3"></i><input type="password" placeholder="请输入密码" v-model="password" /></div>
       </div>
@@ -22,9 +23,10 @@
 </template>
 
 <script>
+import Vue from "vue";
+import { set } from "../../js/storage";
 import host from "../../js/host";
 // import _ from "lodash";
-import Vue from "vue";
 import { Toast } from "vant";
 
 Vue.use(Toast);
@@ -36,7 +38,11 @@ export default {
       logType: 1, // 0 账号登录 1验证码登录
       phoneNumber: "",
       codeNumber: "",
-      password: ""
+      password: "",
+      timer: "",
+      codeFlag: true,
+      count: 0,
+      canClick: true
     };
   },
   methods: {
@@ -57,14 +63,34 @@ export default {
           Toast("请输入正确的手机号");
           return;
         }
+        if (!this.canClick) return;
+        this.canClick = false;
         const res = await this.$http.get(host.API + "login/sendSms/" + this.phoneNumber);
-        if (res.errorCode) {
+        if (res.errorCode === 200) {
           Toast(res.msg);
+          this.getCode();
+        } else {
+          this.canClick = true;
         }
       } catch (err) {
-        this.isLoading = false;
-        this.isOver = true;
         console.log(err);
+      }
+    },
+    getCode() {
+      const TIME_COUNT = 60;
+      if (!this.timer) {
+        this.count = TIME_COUNT;
+        this.codeFlag = false;
+        this.timer = setInterval(() => {
+          if (this.count > 0 && this.count <= TIME_COUNT) {
+            this.count--;
+          } else {
+            this.codeFlag = true;
+            clearInterval(this.timer);
+            this.timer = null;
+            this.canClick = true;
+          }
+        }, 1000);
       }
     },
     onLogin() {
@@ -95,31 +121,41 @@ export default {
     },
     async onCodeLogin() {
       try {
-        const { phoneNumber, password } = this;
-        const params = { phone: phoneNumber, password: password };
-        const res = await this.$http.post(host.API + "login/PhonePwdLogin", params);
-        if (res.errorCode) {
+        const { phoneNumber, codeNumber } = this;
+        const res = await this.$http.get(host.API + "login/verificationLogin/" + phoneNumber + "/" + codeNumber);
+        if (res.errorCode === 200) {
+          this.onStorage(res.data);
+          this.$router.push({
+            name: "my"
+          });
+        } else {
           Toast(res.msg);
         }
       } catch (err) {
-        this.isLoading = false;
-        this.isOver = true;
         console.log(err);
       }
     },
+
     async onPwdLogin() {
       try {
         const { phoneNumber, password } = this;
-        const params = { phone: phoneNumber, password: password };
-        const res = await this.$http.post(host.API + "login/PhonePwdLogin", params);
-        if (res.errorCode) {
+        const res = await this.$http.post(host.API + "login/PhonePwdLogin?password=" + password + "&phone=" + phoneNumber);
+        if (res.errorCode === 200) {
+          this.onStorage(res.data);
+          this.$router.push({
+            name: "my"
+          });
+        } else {
           Toast(res.msg);
         }
       } catch (err) {
-        this.isLoading = false;
-        this.isOver = true;
         console.log(err);
       }
+    },
+
+    onStorage(data) {
+      set("isLogin", true);
+      set("use", data);
     }
   }
 };

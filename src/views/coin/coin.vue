@@ -1,9 +1,9 @@
 <template>
-  <div class="coin">
+  <div class="container">
     <div class="info">
-      <div class="number-total">SEELE数量：XXX</div>
+      <div class="number-total">SEELE数量：{{ currency.userAccount }}</div>
       <div class="number-line"></div>
-      <div class="number-use">可提数量：XXX</div>
+      <div class="number-use">可提数量：{{ currency.maxExtractNumber }}</div>
     </div>
     <div class="formbox">
       <div class="input">
@@ -35,11 +35,41 @@
 </template>
 
 <script>
-export default {};
+import Vue from "vue";
+import { get } from "../../js/storage";
+import { Toast } from "vant";
+
+Vue.use(Toast);
+
+export default {
+  name: "coin",
+  data() {
+    return {
+      use: "",
+      currency: "",
+      isLogin: false
+    };
+  },
+  methods: {
+    init() {
+      this.isLogin = get("isLogin");
+      if (!this.isLogin) {
+        this.$router.push({
+          name: "login"
+        });
+      } else {
+        this.currency = get("currency");
+      }
+    }
+  },
+  mounted() {
+    this.init();
+  }
+};
 </script>
 
 <style lang="less" scoped>
-.coin {
+.container {
   width: 100vw;
   min-height: 100%;
   padding-top: 60px;

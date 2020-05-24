@@ -31,10 +31,10 @@ export default {};
 <style lang="less">
 @import "css/reset";
 .page {
-  min-height: 100vh;
+  height: 100%;
   font-size: 24px;
 }
-.keepAlive {
+.keepAlive .container {
   padding-bottom: 120px;
 }
 .van-tabbar {

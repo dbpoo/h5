@@ -1,5 +1,5 @@
 <template>
-  <div class="index">
+  <div class="container">
     <div class="topbar">
       <div class="logo"></div>
     </div>
@@ -50,12 +50,12 @@
 
 <script>
 export default {
-  name: "index",
+  name: "index"
 };
 </script>
 
 <style lang="less" scoped>
-.index {
+.container {
   padding-top: 130px;
 }
 

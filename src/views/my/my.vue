@@ -1,24 +1,24 @@
 <template>
-  <div class="my">
+  <div class="container">
     <div class="infobox">
       <div class="info-l">
         <div class="copy">
-          <div class="copy-txt ellips-1">0x1Nh7uHdv0x1Nh7uHdv0x1Nh7uHdv</div>
-          <div class="copy-btn"></div>
+          <div class="copy-txt ellips-1">{{ use.walletaddress }}</div>
+          <div class="copy-btn" id="code" :data-clipboard-text="use.walletaddress" @click="onCopy"></div>
         </div>
-        <div class="qr">
-          <img :src="qr" alt="" srcset="" />
-        </div>
+        <div class="qr" id="qrcode"></div>
       </div>
       <div class="info-r">
         <ul>
           <li class="li1">SEELE数量</li>
-          <li class="li2"><b>0</b> SEELE</li>
-          <li class="li3">( 累计可提100 SEELE )</li>
+          <li class="li2">
+            <b>{{ use.userAccount }}</b> SEELE
+          </li>
+          <li class="li3">( 累计可提{{ currency.maxExtractNumber }} SEELE )</li>
         </ul>
       </div>
     </div>
-    <div class="button">提币</div>
+    <div class="button" @click="toCoin">提币</div>
     <div class="my-link">
       <a href="javascript:;" @click="onPassport">修改密码</a>
     </div>
@@ -51,11 +51,22 @@
 </template>
 
 <script>
+import Vue from "vue";
+import { set, get } from "../../js/storage";
+import QRCode from "qrcodejs2";
+import host from "../../js/host";
+import Clipboard from "clipboard";
+import { Toast } from "vant";
+
+Vue.use(Toast);
+
 export default {
   name: "my",
   data() {
     return {
-      qr: "https://seelen.pro/img/qr.png"
+      use: "",
+      currency: "",
+      isLogin: false
     };
   },
   methods: {
@@ -63,13 +74,68 @@ export default {
       this.$router.push({
         name: "register"
       });
+    },
+    onCopy() {
+      const clipboard = new Clipboard("#copy");
+      clipboard.on("success", (e) => {
+        this.$message({ type: "success", message: "复制成功" });
+        clipboard.destroy();
+      });
+      clipboard.on("error", (e) => {
+        this.$message({ type: "waning", message: "该浏览器不支持自动复制" });
+        clipboard.destroy();
+      });
+    },
+    async getCurrency() {
+      try {
+        const res = await this.$http.get(host.API + "userAccount/getCurrency/" + this.use.id);
+        if (res.errorCode === 200) {
+          this.currency = res.data;
+          set("currency", res.data);
+        } else {
+          Toast(res.msg);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    toCoin() {
+      this.$router.push({
+        name: "coin"
+      });
+    },
+    init() {
+      this.isLogin = get("isLogin");
+      if (!this.isLogin) {
+        this.$router.push({
+          name: "login"
+        });
+      } else {
+        this.use = get("use");
+        if (this.use) {
+          if (this.use.walletqrcode) {
+            // eslint-disable-next-line no-new
+            new QRCode("qrcode", {
+              text: this.use.walletqrcode,
+              width: 80,
+              height: 80
+            });
+          }
+          if (this.use.id) {
+            this.getCurrency();
+          }
+        }
+      }
     }
+  },
+  mounted() {
+    this.init();
   }
 };
 </script>
 
 <style lang="less" scoped>
-.my {
+.container {
   min-height: 100%;
   display: flex;
   flex-direction: column;

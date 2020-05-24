@@ -1,5 +1,5 @@
 <template>
-  <div class="list">
+  <div class="container">
     <div class="topbar">
       <div class="logo"></div>
     </div>
@@ -75,7 +75,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.list {
+.container {
   padding-top: 130px;
 }
 
