@@ -16,9 +16,9 @@
         </ul>
       </router-link>
     </div>
-    <div class="loadmore">
-      <loading :isLoading="isLoading" v-if="isLoading"></loading>
-      <a href="javascript:;" @click="getMore" :class="isOver ? 'is-over' : ''" v-else>{{ isOver ? "没有更多了" : "加载更多" }}</a>
+    <loading :isLoading="isLoading" v-if="isLoading"></loading>
+    <div class="loadmore" v-else>
+      <a href="javascript:;" @click="getMore" :class="isOver ? 'is-over' : ''">{{ isOver ? "没有更多了" : "加载更多" }}</a>
     </div>
   </div>
 </template>
@@ -44,7 +44,7 @@ export default {
     async getCms(page) {
       try {
         this.isLoading = true;
-        const res = await this.$http.get("http://api.lkbt.pro/wp-json/wp/v2/posts", {
+        const res = await this.$http.get("https://api.lkbt.pro/wp-json/wp/v2/posts", {
           categories: this.categories,
           page: page
         });

@@ -4,28 +4,63 @@
       <div class="logo"></div>
     </div>
     <div class="banner"></div>
-    <div class="news-detail">
+    <div class="news-detail" v-if="newsData">
       <div class="infos">
         <div class="location">新闻动态 &gt; <span>新闻详情</span></div>
-        <div class="time">2020-05-22</div>
+        <div class="time">{{ newsData.time }}</div>
       </div>
-      <div class="title">Seele元一金融领域应用解析</div>
-      <div class="content">
-        <p>
-          近年来，大数据、云计算、人工智能、区块链等新兴技术被应用于金融领域，改变了金融产品和金融服务形式。Seele元一品牌升级后，也将在金融领域大展拳脚。
-        </p>
-      </div>
+      <div class="title">{{ newsData.title }}</div>
+      <div class="content" v-html="newsData.html"></div>
     </div>
+    <loading v-if="isLoading"></loading>
   </div>
 </template>
 
 <script>
+import _ from "lodash";
+import Loading from "../../components/loading/loading";
+
 export default {
-  name: "list",
+  name: "detail",
+  components: {
+    Loading
+  },
+  data() {
+    return {
+      id: this.$route.params.id,
+      newsData: "",
+      isLoading: true
+    };
+  },
+  methods: {
+    async getCms() {
+      try {
+        this.isLoading = true;
+        const res = await this.$http.get("https://api.lkbt.pro/wp-json/wp/v2/posts/" + this.id);
+        this.isLoading = false;
+        let time = _.get(res, "date", "");
+        if (time.indexOf("T") > -1) {
+          time = time.split("T")[0];
+        }
+        this.newsData = {
+          title: _.get(res, "title.rendered", ""),
+          time,
+          html: _.get(res, "content.rendered", "")
+        };
+      } catch (err) {
+        this.isLoading = false;
+        this.isOver = true;
+        console.log(err);
+      }
+    }
+  },
+  mounted() {
+    this.getCms();
+  }
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .detail {
   padding-top: 130px;
 }
@@ -84,6 +119,12 @@ export default {
       margin-bottom: 20px;
       color: #6c6c6c;
       text-indent: 56px;
+    }
+    img {
+      width: 100%;
+    }
+    .has-text-align-center {
+      text-align: center;
     }
   }
 }

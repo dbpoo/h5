@@ -3,28 +3,40 @@
     <div class="avatar"></div>
     <div class="formbox">
       <div class="input">
-        <div class="input-li"><i class="input-li1"></i><input type="text" placeholder="请输入手机号码" /></div>
+        <div class="input-li"><i class="input-li1"></i><input type="text" placeholder="请输入手机号码" v-model="phoneNumber" /></div>
         <div class="input-li" v-if="logType == 1">
-          <i class="input-li2"></i><input type="text" placeholder="请输入验证码" /><span>获取验证码</span>
+          <i class="input-li2"></i><input type="text" placeholder="请输入验证码" v-model="codeNumber" /><span @click="onVerification"
+            >获取验证码</span
+          >
         </div>
-        <div class="input-li" v-if="logType == 0"><i class="input-li3"></i><input type="text" placeholder="请输入密码" /></div>
+        <div class="input-li" v-if="logType == 0"><i class="input-li3"></i><input type="password" placeholder="请输入密码" v-model="password" /></div>
       </div>
       <div class="link-li">
         <a href="javascript:;" v-if="logType == 1" @click="toAccess">账号登录</a>
         <a href="javascript:;" v-if="logType == 0" @click="toVerification">验证码登录</a>
         <router-link :to="{ name: 'register' }">找回密码</router-link>
       </div>
-      <div class="button">提交</div>
+      <div class="button" @click="onLogin">提交</div>
     </div>
   </div>
 </template>
 
 <script>
+import host from "../../js/host";
+// import _ from "lodash";
+import Vue from "vue";
+import { Toast } from "vant";
+
+Vue.use(Toast);
+
 export default {
   name: "login",
   data() {
     return {
-      logType: 0, // 0 账号登录 1验证码登录
+      logType: 1, // 0 账号登录 1验证码登录
+      phoneNumber: "",
+      codeNumber: "",
+      password: ""
     };
   },
   methods: {
@@ -34,7 +46,82 @@ export default {
     toVerification() {
       this.logType = 1;
     },
-  },
+    async onVerification() {
+      try {
+        const phoneReg = /^1[0-9]{10}$/;
+        if (!this.phoneNumber) {
+          Toast("请输入手机号");
+          return;
+        }
+        if (!phoneReg.test(this.phoneNumber)) {
+          Toast("请输入正确的手机号");
+          return;
+        }
+        const res = await this.$http.get(host.API + "login/sendSms/" + this.phoneNumber);
+        if (res.errorCode) {
+          Toast(res.msg);
+        }
+      } catch (err) {
+        this.isLoading = false;
+        this.isOver = true;
+        console.log(err);
+      }
+    },
+    onLogin() {
+      const phoneReg = /^1[0-9]{10}$/;
+      if (!this.phoneNumber) {
+        Toast("请输入手机号");
+        return;
+      }
+      if (!phoneReg.test(this.phoneNumber)) {
+        Toast("请输入正确的手机号");
+        return;
+      }
+      if (this.logType === 1) {
+        // 验证码登录
+        if (!this.codeNumber) {
+          Toast("请输入验证码");
+          return;
+        }
+        this.onCodeLogin();
+      } else {
+        // 密码登录
+        if (!this.password) {
+          Toast("请输入密码");
+          return;
+        }
+        this.onPwdLogin();
+      }
+    },
+    async onCodeLogin() {
+      try {
+        const { phoneNumber, password } = this;
+        const params = { phone: phoneNumber, password: password };
+        const res = await this.$http.post(host.API + "login/PhonePwdLogin", params);
+        if (res.errorCode) {
+          Toast(res.msg);
+        }
+      } catch (err) {
+        this.isLoading = false;
+        this.isOver = true;
+        console.log(err);
+      }
+    },
+    async onPwdLogin() {
+      try {
+        const { phoneNumber, password } = this;
+        const params = { phone: phoneNumber, password: password };
+        const res = await this.$http.post(host.API + "login/PhonePwdLogin", params);
+        if (res.errorCode) {
+          Toast(res.msg);
+        }
+      } catch (err) {
+        this.isLoading = false;
+        this.isOver = true;
+        console.log(err);
+      }
+    }
+  }
 };
 </script>
 
@@ -72,6 +159,7 @@ export default {
     height: 48px;
     line-height: 48px;
     background: none;
+    color: #fff;
   }
   i,
   span {

@@ -1,8 +1,10 @@
 <template>
-  <div class="ball-pulse">
-    <div></div>
-    <div></div>
-    <div></div>
+  <div class="loading">
+    <div class="ball-pulse">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
   </div>
 </template>
 
@@ -11,6 +13,12 @@ export default {};
 </script>
 
 <style lang="less" scoped>
+.loading {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 @keyframes scale {
   0% {
     -webkit-transform: scale(1);

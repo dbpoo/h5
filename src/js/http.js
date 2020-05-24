@@ -12,7 +12,7 @@ const http = {
     }
     return request(requestUrl, options);
   },
-  post: (url, params, opt) => {
+  post: (url, params = {}, opt = {}) => {
     const requestUrl = url;
     let options = {
       method: "POST"

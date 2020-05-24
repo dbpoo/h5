@@ -19,6 +19,9 @@
       </div>
     </div>
     <div class="button">提币</div>
+    <div class="my-link">
+      <a href="javascript:;" @click="onPassport">修改密码</a>
+    </div>
     <div class="coin-list">
       <div class="time">4月20 2020</div>
       <div class="list">
@@ -52,9 +55,16 @@ export default {
   name: "my",
   data() {
     return {
-      qr: "https://seelen.pro/img/qr.png",
+      qr: "https://seelen.pro/img/qr.png"
     };
   },
+  methods: {
+    onPassport() {
+      this.$router.push({
+        name: "register"
+      });
+    }
+  }
 };
 </script>
 
@@ -146,7 +156,15 @@ export default {
   background-color: #33acb8;
   border-radius: 20px;
   text-align: center;
-  margin-bottom: 90px;
+  margin-bottom: 30px;
+}
+
+.my-link {
+  margin-bottom: 60px;
+  a {
+    margin: 0 20px;
+    display: inline-block;
+  }
 }
 
 .coin-list {
