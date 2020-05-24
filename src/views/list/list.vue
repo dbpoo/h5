@@ -115,15 +115,13 @@ export default {
     border-top: 1px solid #c9c9c9;
     padding: 20px;
     li.li1 {
-      font-size: 38px;
-      margin-bottom: 20px;
+      font-size: 28px;
+      margin-bottom: 10px;
     }
     li.li2 {
-      font-size: 30px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
     li.li3 {
-      font-size: 30px;
       display: flex;
       justify-content: space-between;
     }
@@ -139,7 +137,6 @@ export default {
     color: #fff;
     background-color: #007586;
     border-radius: 10px;
-    font-size: 30px;
   }
   a,
   span {

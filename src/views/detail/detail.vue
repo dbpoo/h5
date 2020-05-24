@@ -118,7 +118,6 @@ export default {
     p {
       margin-bottom: 20px;
       color: #6c6c6c;
-      text-indent: 56px;
     }
     img {
       width: 100%;
