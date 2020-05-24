@@ -8,16 +8,16 @@
     <div class="formbox">
       <div class="input">
         <div class="input-l">提币数量：</div>
-        <div class="input-c"><input type="text" /></div>
-        <div class="input-r">全部</div>
+        <div class="input-c"><input type="number" v-model="amount" @input="changeInput" /></div>
+        <div class="input-r" @click="onAll">全部</div>
       </div>
       <div class="input">
         <div class="input-l">手续费率：</div>
-        <div class="input-c">10</div>
+        <div class="input-c">{{ exchange }}</div>
       </div>
       <div class="input">
         <div class="input-l">实际到账数量：</div>
-        <div class="input-c">100</div>
+        <div class="input-c">{{ total }}</div>
       </div>
     </div>
 
@@ -36,6 +36,8 @@
 
 <script>
 import Vue from "vue";
+import host from "../../js/host";
+import _ from "lodash";
 import { get } from "../../js/storage";
 import { Toast } from "vant";
 
@@ -47,10 +49,54 @@ export default {
     return {
       use: "",
       currency: "",
-      isLogin: false
+      exchange: "",
+      isLogin: false,
+      amount: 0,
+      total: 0
     };
   },
-  methods: {},
+  methods: {
+    onAll() {
+      this.amount = this.currency.maxExtractNumber;
+    },
+    changeInput: _.debounce(function(e) {
+      if (this.amount >= 100) {
+        this.serviceCharge(this.amount);
+      } else if (this.amount > 0 && this.amount < 100) {
+        Toast("转账提币金额必须大于100");
+      }
+    }, 500),
+    async exchangeRate() {
+      try {
+        const res = await this.$http.get(host.API + "/userAccount/exchangeRate");
+        if (res.errorCode === 200) {
+          this.exchange = res.data.exchangeRate;
+        } else {
+          Toast(res.msg);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async serviceCharge(amount) {
+      try {
+        const params = {
+          amount,
+          userId: this.use.id,
+          operator: 3
+        };
+        const res = await this.$http.post(host.API + "/userAccount/serviceCharge", params);
+        if (res.errorCode === 200) {
+          this.total = res.data.total;
+        } else {
+          Toast(res.msg);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  },
   mounted() {
     this.isLogin = get("isLogin");
     if (!this.isLogin) {
@@ -58,7 +104,9 @@ export default {
         name: "login"
       });
     } else {
+      this.use = get("use");
       this.currency = get("currency");
+      this.exchangeRate();
     }
   }
 };
