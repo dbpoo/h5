@@ -71,7 +71,7 @@ export default {
         this.total = 0;
         Toast("转账提币金额必须大于100");
       }
-    }, 500),
+    }, 1000),
     async getCurrency() {
       try {
         const res = await this.$http.get(host.API + "userAccount/getCurrency/" + this.use.id);
@@ -119,6 +119,11 @@ export default {
       try {
         if (this.amount < 100) {
           Toast("转账提币金额必须大于100");
+          return;
+        }
+        if (this.amount > this.currency.maxExtractNumber) {
+          Toast("您的可提数量不足，请核对后提交");
+          return;
         }
         const params = {
           amount: this.amount,
@@ -131,7 +136,7 @@ export default {
         };
         const res = await this.$http.post(host.API + "userAccount/extractCoin", params);
         if (res.errorCode === 200) {
-          Toast(res.msg);
+          Toast("您的提币申请已提交，请等待审核");
           this.getCurrency();
         } else {
           Toast(res.msg);
