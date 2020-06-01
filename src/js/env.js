@@ -1,2 +1,2 @@
-const env = "pre";
+const env = "prd";
 export default env;
